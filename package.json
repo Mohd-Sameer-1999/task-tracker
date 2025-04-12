@@ -1,0 +1,17 @@
+{
+  "name": "task-cli",
+  "version": "1.0.0",
+  "description": "cli for tracking tasks",
+  "license": "ISC",
+  "author": "Sameer",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "task-cli": "task-tracker/bin/task-cli.js"
+  },
+  "dependencies": {
+    "nanoid": "^5.1.5"
+  }
+}
