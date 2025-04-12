@@ -1,46 +1,41 @@
-function listAllTasks(type = ''){
-    const fs = require("fs")
-    console.log(type);
-    if(!type) {
-        fs.access('./tasks/', fs.constants.F_OK, (err) => {
-            if (err) {
-              throw err;
-            }
-            fs.readdir(`./tasks`, (error, files) => {
-                if(error)
-                    throw error;
-                
-                console.log(files)
-            })
-        });
-       
-    } else {
-        fs.access(`./tasks/`, fs.constants.F_OK, (err) => {
-            if (err) {
-              throw err;
-            }
-            fs.readdir(`./tasks`, (error, files) => {
-                if(error)
-                    throw error;
-                
-                let result = []
-                for(let i = 0; i < files.length; i++){
-                    fs.readFile(`./tasks/${files[i]}`, (error, data) => {
-                        if(error)
-                            throw error;
-
-                        let jsonData = JSON.parse(data);
-                        console.log(jsonData);
-                        if(jsonData.status === type){
-                            result.push(files[i]);
-                        }
-                    })
+const fs = require("fs").promises;
+async function listAllTasks(type = ''){
+    try{
+        try{
+            await fs.access("./tasks");
+    
+        } catch(error) {
+            console.error("task directory not found - ", error);
+            return;
+        }
+    
+        const files = await fs.readdir("./tasks")
+    
+        if(!type) { 
+            console.log(files);
+        }
+    
+        let result = [];
+        const fileProcessingPromises = files.map(async (file) => {
+            try{
+                const data = await fs.readFile(`./tasks/${file}`, "utf8");
+                const task = JSON.parse(data);
+                if(task.status === type){
+                    result.push(file);
                 }
-                console.log(result);
-               
-            })
-        });
+            } catch(error) {
+                console.error(error);
+            }
+        })
+    
+        await Promise.all(fileProcessingPromises);
+
+        return result;
+
+    } catch (error) {
+        console.error(error);
     }
+
 }
 
 module.exports = listAllTasks;
